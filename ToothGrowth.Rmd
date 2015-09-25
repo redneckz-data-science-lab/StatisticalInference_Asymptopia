@@ -1,34 +1,82 @@
 ---
-title: "Tooth Growth Delivery Methods Data Analyses"
+title: "The Effect of Vitamin C on Tooth Growth in Guinea Pigs"
 author: "Alexander Alexandrov"
-output: html_document
+output: pdf_document
 mode: selfcontained
 ---
+
+# Overview
+
+This paper contains some basic analysis of the ToothGrowth data.
+Analysis object is effectivness of different supplement types against teeth response.
+The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).
+
+# Tooth Growth Data Overview
+
+Load the tooth growth data.
 
 ```{r}
 library(datasets)
 library(data.table)
 data <- data.table(ToothGrowth)
+dose.levels <- as.numeric(levels(factor(data$dose)))
 str(data)
 ```
 
-```{r}
-dose.levels <- as.numeric(levels(factor(data$dose)))
-dose.levels
-```
+Data is clean anough.
+
+|Variable|Type|Domain|Description|
+|---|---|---|---|
+|**len**|numeric|positive real number|Tooth length|
+|**supp**|factor|string: "VC" (ascorbic acid), "OJ" (orange juice)|Supplement type|
+|**len**|numeric|positive real number: 0.5, 1.0, 2.0|Dose in milligrams|
+
+\newpage
+
+# Further exploratory data analyses
+
+Some usefull plots.
 
 ```{r}
 library(ggplot2)
-qplot(supp, len, data = data, size = 2, colour = supp, geom = c("boxplot", "point"),
-      facets = ~dose)
-```
-
-```{r}
 qplot(dose, len, data = data, size = 2, colour = supp, geom = c("boxplot", "point"),
-      alpha = 0.2)
+      alpha = 0.2, main = "Response by supplement type", ylab = "Response (length)")
 ```
 
+According to quantiles (boxplots) orange juice (red) is slightly better then ascorbic acid.
+
+\newpage
+
+Next group response by dose and supplement type.
+
 ```{r}
-ComputeConfInt <- function(d) t.test(len ~ supp, data = data[dose == d], paired = F)$conf.int
-conf.intervals <- lapply(dose.levels, ComputeConfInt)
+qplot(supp, len, data = data, size = 2, colour = supp, geom = c("boxplot", "point"),
+      alpha = 0.2, facets = ~dose,
+      main = "Response by dose and supplement type", ylab = "Response (length)")
 ```
+
+It's evident from figure that orange juice is preferable only in case of the small doses.
+Results for the 2.0 mg dose are very close to each other.
+
+\newpage
+
+# Confidence intervals
+
+Paired confidence intervals (orange juice vs ascorbic acid) for each dose.
+
+```{r}
+ComputeConfInt <- function(d) {
+    conf.int <- t.test(len ~ supp, data = data[dose == d], paired = F)$conf.int
+    return(data.table(dose = d, low = conf.int[1], high = conf.int[2]))
+}
+conf.intervals <- rbindlist(lapply(dose.levels, ComputeConfInt))
+conf.intervals
+```
+
+So with the 95% confidence following assumptions can be made:
+
+|Dose (mg)|OJ-VC teeth response 95% conf. int.|Description|
+|---|---|---|
+|**0.5**|from 1.7 to 8.8|Conf. int. is positive, so orange juice is the best choise for small doses|
+|**1.0**|from 2.8 to 9.1||
+|**2.0**|from -3.8 to 3.6|Orange juice has slightly same effect compared to ascorbic acid|
