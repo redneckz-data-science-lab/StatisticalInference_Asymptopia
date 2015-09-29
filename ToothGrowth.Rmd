@@ -8,7 +8,7 @@ mode: selfcontained
 # Overview
 
 This paper contains some basic analysis of the ToothGrowth data.
-Analysis object is effectivness of different supplement types against teeth response.
+Analysis object is effectivness of the different supplement types against teeth response.
 The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).
 
 # Tooth Growth Data Overview
@@ -23,7 +23,7 @@ dose.levels <- as.numeric(levels(factor(data$dose)))
 str(data)
 ```
 
-Data is clean anough.
+Data is clean enough.
 
 |Variable|Type|Domain|Description|
 |---|---|---|---|
@@ -47,7 +47,7 @@ According to quantiles (boxplots) orange juice (red) is slightly better then asc
 
 \newpage
 
-Next group response by dose and supplement type.
+Group response by dose and supplement type.
 
 ```{r}
 qplot(supp, len, data = data, size = 2, colour = supp, geom = c("boxplot", "point"),

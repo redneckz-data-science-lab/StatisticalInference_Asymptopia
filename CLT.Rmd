@@ -9,7 +9,7 @@ mode: selfcontained
 
 * The LLN states that the average limits to what it's estimating, the population mean.
 * The CLT states that the distribution of averages of iid variables (properly normalized) becomes that of a standard normal as the sample size increases.
-* This papre illustrates these lwas by the example based on the of exponential distribution.
+* This paper illustrates these lwas by the example based on the exponential distribution.
 * The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda.
 
 \newpage
@@ -54,7 +54,7 @@ According to the LLN, the sample mean limits to the theoretical mean. **Theoreti
 The relative difference between theoretical mean and sample mean:
 
 ```{r}
-paste(round(abs(mean(means) - population.mean) * 100, 1), "%", sep = "")
+paste(round(abs(mean(means) - population.mean) * 100 / population.mean, 1), "%", sep = "")
 ```
 
 \newpage
@@ -96,10 +96,10 @@ The useful way to think about the CLT is that $\bar X_n$ is approximately $N(\mu
 ```{r, fig.width=9, fig.height = 6, fig.align='center'}
 cfunc <- function(x, n) (mean(x) - population.mean) / (population.sd / sqrt(n))
 dat <- data.frame(
-  x = c(apply(samples[, 1:10], 1, cfunc, 10),
-        apply(samples[, 1:20], 1, cfunc, 20),
+  x = c(apply(samples[, 1:2], 1, cfunc, 2),
+        apply(samples[, 1:5], 1, cfunc, 5),
         apply(samples[, 1:40], 1, cfunc, 40)),
-  size = factor(rep(c(10, 20, 40), rep(nosim, 3))))
+  size = factor(rep(c(2, 5, 40), rep(nosim, 3))))
 g <- ggplot(dat, aes(x = x, fill = size)) + geom_histogram(aes(y = ..density..)) 
 g <- g + stat_function(fun = dnorm, colour = "black", size = 1.5)
 g + facet_grid(. ~ size)
